@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChirpCreated;
 use App\Models\Chirp;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -36,10 +37,7 @@ class ChirpController extends Controller
             'message' => 'required|string|max:255',
         ]);
  
-        $request->user()->chirps()->create($validated); 
-
-        // $validated['user_id'] = Auth::user()->id;
-        // Chirp::create($validated);
+        $chirp = $request->user()->chirps()->create($validated);
         return redirect(route('chirps.index'));
     }
 

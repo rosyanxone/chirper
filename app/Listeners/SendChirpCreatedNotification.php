@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\ChirpCreated;
+use App\Events\ChirpEvent;
 use App\Models\User;
 use App\Notifications\NewChirp;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,6 +26,7 @@ class SendChirpCreatedNotification implements ShouldQueue
     {
         foreach (User::whereNot('id', $event->chirp->user_id)->cursor() as $user) {
             $user->notify(new NewChirp($event->chirp));
+            event(new ChirpEvent($event->chirp->message));
         }
     }
 }
