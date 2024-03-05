@@ -21,16 +21,34 @@
         // Enable pusher logging - don't include this in production
         Pusher.logToConsole = true;
 
-        var pusher = new Pusher('bc6ffac5593c1491a669', {
-            cluster: 'ap1'
+        let token = document.querySelector('meta[name="csrf-token"]').content;
+
+        var pusher = new Pusher('{!! env('PUSHER_APP_KEY') !!}', {
+            cluster: "ap1",
+            channelAuthorization: {
+                endpoint: "/broadcasting/auth",
+                headers: { "X-CSRF-Token": token },
+            },
         });
 
-        var channel = pusher.subscribe('chirp-channel');
-        channel.bind('chirp-event', function(data) {
-            if (data.chirp.user_id != {{ Auth::user()->id }}) {
-                alert(data.chirp.message + " at " + data.chirp.created_at ) 
-            }
+        const userId = {!! json_encode(Auth::user()->id) !!}
+        var channel = pusher.subscribe(`private-App.Models.User.${userId}`);
+        channel.bind("chirp-event", function (data) {
+            alert(data.chirp.message + " at " + data.chirp.created_at);
         });
+    </script>
+
+    {{-- echo --}}
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/laravel-echo/1.16.0/echo.js"></script> --}}
+    <script>
+        // const Echo = new Echo({
+        //     broadcaster: "pusher",
+        //     key: "db7f0a566972cb492eac",
+        //     cluster: "ap1",
+        //     forceTLS: true,
+        //     authEndpoint: "/broadcasting/auth",
+        //     enabledTransports: ["ws", "wss"],
+        // });
     </script>
 </head>
 

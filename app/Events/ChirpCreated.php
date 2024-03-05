@@ -16,12 +16,16 @@ class ChirpCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public Chirp $chirp;
+    public $userId;
+
     /**
      * Create a new event instance.
      */
-    public function __construct(public Chirp $chirp)
+    public function __construct($chirp, $userId)
     {
-        //
+        $this->chirp = $chirp;
+        $this->userId = $userId;
     }
 
     /**
@@ -32,7 +36,7 @@ class ChirpCreated implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new Channel('chirp-channel'),
+            new PrivateChannel('App.Models.User.'.$this->userId),
         ];
     }
 

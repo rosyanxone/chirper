@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ChirpCreated;
+use App\Models\User;
 use App\Models\Chirp;
-use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use App\Events\ChirpCreated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ChirpController extends Controller
 {
@@ -38,6 +39,12 @@ class ChirpController extends Controller
         ]);
  
         $chirp = $request->user()->chirps()->create($validated);
+
+        $users = User::whereNot('id', Auth::user()->id)->get();
+        foreach ($users as $user) {
+            event(new ChirpCreated($chirp, $user->id));
+        }
+
         return redirect(route('chirps.index'));
     }
 
